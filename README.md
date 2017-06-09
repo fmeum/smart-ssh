@@ -15,7 +15,7 @@ smart-ssh is a Chrome app that acts as an ssh-agent for the [Secure Shell](https
     containing an RSA key with the "Authentication" capability.
 
 ## Installation & Usage
-  Install [smart-ssh]() from the Chrome Web Store, start the app and follow the instructions.
+  Install [smart-ssh](https://chrome.google.com/webstore/detail/secure-shell-openpgp-smar/gdbjpffhcollcplpbjehfhpfcpdoicob) from the Chrome Web Store, start the app and follow the instructions.
 
 ## Contributing
 See [CONTRIBUTING.md](https://github.com/FabianHenneke/smart-ssh/blob/master/CONTRIBUTING.md).

@@ -1,0 +1,40 @@
+{
+  "manifest_version": 2,
+  "minimum_chrome_version": "55",
+
+  "name": "Secure Shell - OpenPGP smart card support",
+  "short_name": "smart-ssh",
+  "description": "Use OpenPGP smart cards for SSH public key authentication",
+  "version": "0.0.4",
+  "author": "Fabian Henneke",
+  "icons": {
+    "48": "smart-ssh_48.png",
+    "128": "smart-ssh_128.png"
+  },
+
+  "app": {
+    "background": {
+      "scripts": [
+        "bower_components/chrome-promise/chrome-promise.js",
+        "bower_components/openpgp/dist/openpgp.min.js",
+        "google-smart-card-client-library.js",
+        "smartCard.js",
+        "pinCache.js",
+        "agent.js"
+      ]
+    }
+  },
+
+  "externally_connectable": {
+    "ids": [
+      "okddffdblfhhnmhodogpojmfkjmhinfp",
+      "pnhechapfaindjhompbnflcldabbghjo"
+    ]
+  },
+
+  "permissions": [
+    "alwaysOnTopWindows",
+    "idle",
+    "notifications"
+  ]
+}

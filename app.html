@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Secure Shell - OpenPGP smart card support</title>
+  <link rel="stylesheet" href="app.css" />
+</head>
+
+<body>
+  <h3>How to use SSH private keys stored on a smart card:</h3>
+  <ol>
+    <li class="install-connector-step step-inapplicable">
+      Install (or re-enable) the <a href="https://chrome.google.com/webstore/detail/smart-card-connector/khpfeaanjngmcnplbdlpegiifgpfgdco" target="_blank">Smart Card Connector app</a>.
+    </li>
+    <li class="add-identity-step">
+      <span class="add-identity-message">
+        Insert a smart card...
+      </span>
+      <table class="identity-table">
+        <thead>
+          <tr>
+            <th class="col-reader">Reader</th>
+            <th class="col-fingerprint">Fingerprint</th>
+            <th class="col-ssh-key">SSH public key</th>
+          </tr>
+        </thead>
+        <tbody class="identity-table-body">
+          <tr></tr>
+        </tbody>
+      </table>
+    </li>
+    <li>
+      Add the following to your connection's 'relay options' (<strong>not</strong> the 'SSH Arguments') in the <a href="https://chrome.google.com/webstore/detail/secure-shell/pnhechapfaindjhompbnflcldabbghjo" target="_blank">Secure Shell app</a>:<br>
+      <input class="relay-options" type="text" readonly>
+    </li>
+    <li>
+      Connect in Secure Shell and you will be asked for your smart card PIN. Confirm with Enter and optionally choose to cache the PIN until you either lock the device or remove the smart card.
+    </li>
+  </ol>
+  <br/>
+  Tip: The SSH agent will handle connection requests even if this app window is closed.
+  <hr/>
+  
+
+  <script src="bower_components/chrome-promise/chrome-promise.js" defer></script>
+  <script src="bower_components/openpgp/dist/openpgp.min.js" defer></script>
+  <script src="google-smart-card-client-library.js" defer></script>
+  <script src="smartCard.js" defer></script>
+  <script src="app.js" defer></script>
+</body>
+
+</html>

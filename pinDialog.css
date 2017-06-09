@@ -1,0 +1,65 @@
+body {
+  padding: 5px;
+  margin: 0;
+  font-family: sans-serif;
+  min-width: 230px;
+  background: white;
+  font-size: 14px;
+}
+
+.pin-entry form {
+  margin-bottom: 5px;
+}
+
+.pin-entry input[type="password"] {
+  box-sizing: border-box;
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid #bbb;
+  background: url("bower_components/material-design-icons/action/1x_web/ic_lock_open_black_24dp.png") center right 6px / 16px 16px no-repeat;
+}
+
+.pin-entry input[type="password"]:focus {
+  outline: 0;
+}
+
+.pin-entry input[readOnly] {
+  background: #bbb;
+}
+
+.pin-entry input[type="checkbox"] {
+  vertical-align: middle;
+}
+
+.pin-entry label span {
+  vertical-align: middle;
+}
+
+.pin-entry input[type="submit"] {
+  display: none;
+}
+
+.info {
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+  width: 95%;
+  padding: 8px 2px 8px 2px;
+}
+
+.info .fingerprint-info {
+  background: url("bower_components/material-design-icons/communication/1x_web/ic_vpn_key_black_24dp.png") center left 2px / 16px 16px no-repeat;
+  padding: 6px 0px 6px 22px;
+}
+
+.info .reader-info {
+  background: url("bower_components/material-design-icons/hardware/1x_web/ic_sim_card_black_24dp.png") center left 2px / 16px 16px no-repeat;
+  padding: 6px 0px 6px 22px;
+}
+
+.cache-help {
+  display: inline-block;
+  background: url("bower_components/material-design-icons/action/1x_web/ic_help_black_24dp.png") center center / 16px 16px no-repeat;
+  width: 16px;
+  height: 16px;
+}

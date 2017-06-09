@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+  
+<head>
+  <meta charset="utf-8" />
+  <title>Unlock smart card</title>
+  <link rel="stylesheet" href="pinDialog.css" />
+</head>
+
+<body>
+  <div class="pin-entry">
+    <form>
+      <input type="password" name="pinBox">
+      <input type="submit">
+      <div class="info">
+        <span class="fingerprint-info"></span>
+        <span class="reader-info"></span>
+      </div>
+      <label>
+        <input type="checkbox" name="cachePinCheckbox">
+        <span>Cache PIN</span>
+        <span class="cache-help" title="Cache the PIN until either the corresponding smart card is removed or the user locks the device"></span>
+      </label>
+    </form>
+  </div>
+  
+  <script src="pinDialog.js" defer></script>
+</body>
+
+</html>

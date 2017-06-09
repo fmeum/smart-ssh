@@ -11,6 +11,7 @@ smart-ssh is a Chrome app that acts as an ssh-agent for the [Secure Shell](https
     * a [Nitrokey](https://www.nitrokey.com/)
     * an [OpenPGP card](https://www.g10code.com/p-card.html)
     * ...
+
     containing an RSA key with the "Authentication" capability.
 
 ## Installation & Usage

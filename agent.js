@@ -1,7 +1,6 @@
 (function() {
   'use strict';
 
-  const chromep = new ChromePromise();
   const util = openpgp.util;
   const GSC = GoogleSmartCard;
 

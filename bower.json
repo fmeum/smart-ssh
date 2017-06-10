@@ -24,7 +24,6 @@
     "bower_components"
   ],
   "dependencies": {
-    "chrome-promise": "^2.0.2",
     "openpgp": "^2.5.0",
     "material-design-icons": "^3.0.1"
   }

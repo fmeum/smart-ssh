@@ -1,18 +1,18 @@
 (function() {
-  'use strict'; 
-  
+  'use strict';
+
   const chromep = new ChromePromise();
   const util = openpgp.util;
   const GSC = GoogleSmartCard;
 
   const AGENT_MESSAGE_TYPE = 'auth-agent@openssh.com';
-  
+
   const SSH_AGENT_FAILURE = 5;
   const SSH_AGENT_SUCCESS = 6;
-  
+
   const SSH2_AGENTC_REQUEST_IDENTITIES = 11;
   const SSH2_AGENTC_SIGN_REQUEST = 13;
-  
+
   const SSH2_AGENT_IDENTITIES_ANSWER = 12;
   const SSH2_AGENT_SIGN_RESPONSE = 14;
 
@@ -22,15 +22,15 @@
    * Currently this is only used for the debug logs produced by the server App.
    */
   const CLIENT_TITLE = 'smart-ssh';
-  
+
   /**
    * Identifier of the server App.
    */
   const SERVER_APP_ID = GSC.PcscLiteCommon.Constants.SERVER_OFFICIAL_APP_ID;
-  
-  
+
+
   let identityCache = {};
-  
+
   async function fetchIdentities(manager) {
     identityCache = {};
     let readers;
@@ -56,7 +56,8 @@
         let readerKeyId;
         try {
           await asyncManager.selectApplet();
-          if (await asyncManager.fetchPinVerificationTriesRemaining() === 0) {
+          if (await asyncManager.fetchPinVerificationTriesRemaining() ===
+            0) {
             await asyncManager.disconnect();
             return {};
           }
@@ -64,7 +65,8 @@
           readerKeyId = await asyncManager.fetchAuthenticationPublicKeyId();
         } catch (error) {
           console.log(
-            `Failed to get public key ID from reader ${reader}, skipping.`);
+            `Failed to get public key ID from reader ${reader}, skipping.`
+          );
           smartCard.logError(error);
           return [];
         } finally {
@@ -89,9 +91,9 @@
     const identities = await fetchIdentities(manager);
     await manager.releaseContext();
     const header = util.concatUint8Array([
-        new Uint8Array([SSH2_AGENT_IDENTITIES_ANSWER]),
-        util.writeNumber(identities.length, 4)
-      ]);
+      new Uint8Array([SSH2_AGENT_IDENTITIES_ANSWER]),
+      util.writeNumber(identities.length, 4)
+    ]);
     const body = util.concatUint8Array(identities.map(identity =>
       util.concatUint8Array([
         util.writeNumber(identity.length, 4),
@@ -103,7 +105,7 @@
     ));
     return Array.from(util.concatUint8Array([header, body]));
   }
-  
+
   async function requestAndVerifyPin(manager, fingerprint) {
     let pin = pinCache.getPin(fingerprint, manager.reader);
     let cachePin = false;
@@ -115,7 +117,9 @@
     }
     if (!pin) {
       const pinDialogPromise = new Promise(function(resolve) {
-        dialogData.resolvePromise = (pin, cachePin) => resolve([pin, cachePin]);
+        dialogData.resolvePromise = (pin, cachePin) => resolve([pin,
+          cachePin
+        ]);
       });
       chrome.app.window.create('pinDialog.html', {
           id: 'pinDialog',
@@ -138,7 +142,8 @@
     const pinBytes = util.str2Uint8Array(util.encode_utf8(pin));
     // Verify PIN for authentication
     try {
-      await manager.transmit(new smartCard.CommandAPDU(0x00, 0x20, 0x00, 0x82, pinBytes));
+      await manager.transmit(new smartCard.CommandAPDU(0x00, 0x20, 0x00, 0x82,
+        pinBytes));
       // At this point PIN verification has succeeded
       if (cachePin)
         pinCache.putPin(fingerprint, manager.reader, pin);
@@ -168,7 +173,7 @@
       }
     }
   }
-  
+
   async function authenticateOnSmartCard(manager, reader, readerKeyId, data) {
     try {
       await manager.connect(reader);
@@ -210,7 +215,8 @@
       return;
     }
     const pkcsEncodedMessage = new Uint8Array(
-      openpgp.crypto.pkcs1.emsa.encode(2, util.bin2str(data), modulusLength).toByteArray());
+      openpgp.crypto.pkcs1.emsa.encode(2, util.bin2str(data), modulusLength)
+      .toByteArray());
     // The unpadded input consists of a prefix indicating SHA-1 (15 bytes) and
     // the actual SHA-1 hash (20 bytes)
     const authenticationInput = pkcsEncodedMessage.slice(-35);
@@ -227,17 +233,19 @@
     await manager.disconnect();
     return signature;
   }
-  
+
   // SSH agent protocol, Section 2.6.2
   async function handleSignRequest(body) {
     const keyBlobLength = util.readNumber(body.slice(0, 4));
     const keyBlob = body.slice(4, 4 + keyBlobLength);
-    const dataLength = util.readNumber(body.slice(4 + keyBlobLength, 4 + keyBlobLength + 4));
+    const dataLength = util.readNumber(body.slice(4 + keyBlobLength, 4 +
+      keyBlobLength + 4));
     if (4 + keyBlobLength + 4 + dataLength !== body.length - 4) {
       console.log('SSH2_AGENTC_SIGN_REQUEST: Invalid length fields');
       return [SSH_AGENT_FAILURE];
     }
-    const data = body.slice(4 + keyBlobLength + 4, 4 + keyBlobLength + 4 + dataLength);
+    const data = body.slice(4 + keyBlobLength + 4, 4 + keyBlobLength + 4 +
+      dataLength);
     const flags = util.readNumber(body.slice(body.length - 4));
     if (flags !== 0) {
       console.log('SSH2_AGENTC_SIGN_REQUEST: Flags not supported');
@@ -248,11 +256,15 @@
       console.log('SSH2_AGENTC_SIGN_REQUEST: Invalid key blob/requested');
       return [SSH_AGENT_FAILURE];
     }
-    const {reader, readerKeyId} = identityCache[keyBlobStr];
+    const {
+      reader,
+      readerKeyId
+    } = identityCache[keyBlobStr];
     await smartCard.initializeApiContext();
     const manager = new smartCard.OpenPGPSmartCardManager();
     await manager.establishContext();
-    const signature = await authenticateOnSmartCard(manager, reader, readerKeyId, data);
+    const signature = await authenticateOnSmartCard(manager, reader,
+      readerKeyId, data);
     await manager.releaseContext();
     if (!signature)
       return [SSH_AGENT_FAILURE];
@@ -266,11 +278,11 @@
     ]);
     return Array.from(response);
   }
-  
+
   async function agent(request, port) {
     if (request.type !== AGENT_MESSAGE_TYPE)
       return;
-      
+
     let responseData;
     switch (request.data[0]) {
       // Ping
@@ -308,7 +320,7 @@
       data: responseData
     });
   }
-  
+
   chrome.runtime.onConnectExternal.addListener(function(port) {
     port.onMessage.addListener(agent);
   });
@@ -317,14 +329,13 @@
   });
   chrome.app.runtime.onLaunched.addListener(function() {
     chrome.app.window.create('app.html', {
-          id: 'app',
-          innerBounds: {
-            minWidth: 900,
-            maxWidth: 900,
-            minHeight: 500
-          },
-          resizable: true,
-        }
-    );
+      id: 'app',
+      innerBounds: {
+        minWidth: 900,
+        maxWidth: 900,
+        minHeight: 500
+      },
+      resizable: true,
+    });
   });
 })();

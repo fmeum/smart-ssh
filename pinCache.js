@@ -1,19 +1,19 @@
 const pinCache = (function() {
   'use strict';
-  
+
   let pinCache = {};
-  
+
   function clearCache() {
     pinCache = {};
   }
-  
+
   function getPinCount() {
     let count = 0;
     for (const key in pinCache)
       count += pinCache[key].length;
     return count;
   }
-  
+
   function putPin(key, reader, pin, registerOnDisconnectCallback) {
     if (!(key in pinCache))
       pinCache[key] = {};
@@ -42,14 +42,14 @@ const pinCache = (function() {
       });
     }, 1)
   }
-  
+
   function getPin(key, reader) {
-    if (key in pinCache) 
+    if (key in pinCache)
       if (reader in pinCache[key])
         return pinCache[key][reader];
     return null;
   }
-  
+
   function deletePin(key, reader) {
     if (key in pinCache) {
       // Remove reader (or do nothing if not present)
@@ -59,16 +59,16 @@ const pinCache = (function() {
         delete pinCache[key];
     }
   }
-  
+
   chrome.idle.onStateChanged.addListener(function(state) {
     if (state === "locked")
       clearCache();
   });
-  
+
   chrome.runtime.onSuspend.addListener(function() {
     console.log('pinCache unloaded');
   });
-  
+
   return {
     putPin,
     getPin,

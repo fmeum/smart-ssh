@@ -15,7 +15,6 @@
   "app": {
     "background": {
       "scripts": [
-        "bower_components/chrome-promise/chrome-promise.js",
         "bower_components/openpgp/dist/openpgp.min.js",
         "google-smart-card-client-library.js",
         "smartCard.js",

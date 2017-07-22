@@ -173,7 +173,26 @@
     }
   }
 
-  async function authenticateOnSmartCard(manager, reader, readerKeyId, data) {
+  const HashAlgorithms = {
+    SHA1: {
+      algorithmNumber: 2,
+      inputLength: 35,
+      signaturePrefix: 'ssh-rsa',
+    },
+    SHA256: {
+      algorithmNumber: 8,
+      inputLength: 51,
+      signaturePrefix: 'rsa-sha2-256',
+    },
+    SHA512: {
+      algorithmNumber: 10,
+      inputLength: 83,
+      signaturePrefix: 'rsa-sha2-512',
+    },
+  };
+
+  async function authenticateOnSmartCard(
+      manager, reader, readerKeyId, data, hashAlgo) {
     try {
       await manager.connect(reader);
     } catch (error) {
@@ -214,11 +233,10 @@
       return;
     }
     const pkcsEncodedMessage = new Uint8Array(
-      openpgp.crypto.pkcs1.emsa.encode(2, util.bin2str(data), modulusLength)
+        openpgp.crypto.pkcs1.emsa.encode(hashAlgo.algorithmNumber,
+            util.bin2str(data), modulusLength)
       .toByteArray());
-    // The unpadded input consists of a prefix indicating SHA-1 (15 bytes) and
-    // the actual SHA-1 hash (20 bytes)
-    const authenticationInput = pkcsEncodedMessage.slice(-35);
+    const authenticationInput = pkcsEncodedMessage.slice(-hashAlgo.inputLength);
     let signature;
     try {
       signature = await manager.transmit(new smartCard.CommandAPDU(0x00, 0x88,
@@ -246,8 +264,15 @@
     const data = body.slice(4 + keyBlobLength + 4, 4 + keyBlobLength + 4 +
       dataLength);
     const flags = util.readNumber(body.slice(body.length - 4));
-    if (flags !== 0) {
-      console.log('SSH2_AGENTC_SIGN_REQUEST: Flags not supported');
+    let hashAlgo;
+    if (flags === 0) {
+      hashAlgo = HashAlgorithms.SHA1;
+    } else if (flags & 0b100) {
+      hashAlgo = HashAlgorithms.SHA512;
+    } else if (flags & 0b10) {
+      hashAlgo = HashAlgorithms.SHA256;
+    } else {
+      console.log('SSH2_AGENTC_SIGN_REQUEST: unsupported flags');
       return [SSH_AGENT_FAILURE];
     }
     const keyBlobStr = util.bin2str(keyBlob);
@@ -263,15 +288,16 @@
     const manager = new smartCard.OpenPGPSmartCardManager();
     await manager.establishContext();
     const signature = await authenticateOnSmartCard(manager, reader,
-      readerKeyId, data);
+        readerKeyId, data, hashAlgo);
     await manager.releaseContext();
     if (!signature)
       return [SSH_AGENT_FAILURE];
     const response = util.concatUint8Array([
       new Uint8Array([SSH2_AGENT_SIGN_RESPONSE]),
-      util.writeNumber(4 + 7 + 4 + signature.length, 4),
-      util.writeNumber(7, 4),
-      new Uint8Array(util.str2bin('ssh-rsa')),
+      util.writeNumber(4 + hashAlgo.signaturePrefix.length + 4 +
+          signature.length, 4),
+      util.writeNumber(hashAlgo.signaturePrefix.length, 4),
+      new Uint8Array(util.str2bin(hashAlgo.signaturePrefix)),
       util.writeNumber(signature.length, 4),
       signature
     ]);

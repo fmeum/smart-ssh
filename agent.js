@@ -37,7 +37,7 @@
       readers = await manager.listReaders();
     } catch (error) {
       console.log('Failed to list readers.');
-      smartCard.logError(error);
+      await smartCard.logError(error);
       return [];
     }
     return Promise.all(readers.map(async function(reader) {
@@ -47,7 +47,7 @@
           await asyncManager.connect(reader);
         } catch (error) {
           console.log(`Failed to connect to reader ${reader}, skipping.`);
-          smartCard.logError(error);
+          await smartCard.logError(error);
           await asyncManager.releaseContext();
           return [];
         }
@@ -66,7 +66,7 @@
           console.log(
             `Failed to get public key ID from reader ${reader}, skipping.`
           );
-          smartCard.logError(error);
+          await smartCard.logError(error);
           return [];
         } finally {
           await asyncManager.disconnect();
@@ -178,7 +178,7 @@
       await manager.connect(reader);
     } catch (error) {
       console.log(`Failed to connect to reader ${reader}.`);
-      smartCard.logError(error);
+      await smartCard.logError(error);
       return;
     }
     let currentReaderKeyId;
@@ -186,7 +186,7 @@
       currentReaderKeyId = await manager.fetchAuthenticationPublicKeyId();
     } catch (error) {
       console.log(`Failed to fetch public key ID from reader ${reader}.`);
-      smartCard.logError(error);
+      await smartCard.logError(error);
       await manager.disconnect();
       return;
     }
@@ -200,7 +200,7 @@
       await requestAndVerifyPin(manager, fingerprint);
     } catch (error) {
       console.log('PIN verification failed.');
-      smartCard.logError(error);
+      await smartCard.logError(error);
       await manager.disconnect();
       return;
     }
@@ -209,7 +209,7 @@
       modulusLength = await manager.fetchAuthenticationModulusLengthBytes();
     } catch (error) {
       console.log(`Failed to fetch key modulus length from reader ${reader}.`);
-      smartCard.logError(error);
+      await smartCard.logError(error);
       await manager.disconnect();
       return;
     }
@@ -225,7 +225,7 @@
         0x00, 0x00, authenticationInput));
     } catch (error) {
       console.log('Internal authenticate failed.');
-      smartCard.logError(error);
+      await smartCard.logError(error);
       await manager.disconnect();
       return;
     }

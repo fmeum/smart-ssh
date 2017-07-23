@@ -5,7 +5,7 @@
   "name": "Secure Shell - OpenPGP smart card support",
   "short_name": "smart-ssh",
   "description": "Use OpenPGP smart cards for SSH public key authentication",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "author": "Fabian Henneke",
   "icons": {
     "48": "smart-ssh_48.png",

@@ -1,4 +1,4 @@
-**Note:** Most of the functionality of smart-ssh has been integrated directly into [Secure Shell](https://chrome.google.com/webstore/detail/secure-shell/pnhechapfaindjhompbnflcldabbghjo). A [setup guide](https://chromium.googlesource.com/apps/libapps/+/master/nassh/doc/hardware-keys.md) is available.
+## **Note:** Most of the functionality of smart-ssh has been integrated directly into [Secure Shell](https://chrome.google.com/webstore/detail/secure-shell/pnhechapfaindjhompbnflcldabbghjo). A [setup guide](https://chromium.googlesource.com/apps/libapps/+/master/nassh/doc/hardware-keys.md) is available.
 
 Secure Shell - OpenPGP smart card support (smart-ssh)
 =========
